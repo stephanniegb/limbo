@@ -27,6 +27,7 @@ export default function Home() {
   const [crashPoint, setCrashPoint] = useState<number>(3);
   const [gameRunning, setGameRunning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [payout, setPayout] = useState<number | null>(null);
   const [gameHistory, setGameHistory] = useState<GameHistory[]>([]);
 
   const motionMultiplier = useMotionValue(1);
@@ -69,6 +70,7 @@ export default function Home() {
     setCrashPoint(crash);
     setGameRunning(true);
     setResult(null);
+    setPayout(null);
     setCurrentMultiplier(1.0);
     motionMultiplier.set(1);
 
@@ -78,9 +80,11 @@ export default function Home() {
       onUpdate: (v) => setCurrentMultiplier(v),
       onComplete: () => {
         const targetMultiplier = parseFloat(multiplier);
+        const betAmountNum = parseFloat(betAmount);
         const won = targetMultiplier <= crash;
 
         setResult(won ? "Win" : "Loss");
+        setPayout(won ? betAmountNum * targetMultiplier : 0);
         setGameRunning(false);
 
         const newGame: GameHistory = {
@@ -143,6 +147,7 @@ export default function Home() {
             gameRunning={gameRunning}
             currentMultiplier={currentMultiplier}
             result={result}
+            payout={payout}
             scale={scale}
             height={height}
           />

@@ -6,6 +6,7 @@ interface GameDisplayProps {
   gameRunning: boolean;
   currentMultiplier: number;
   result: string | null;
+  payout: number | null;
   scale: MotionValue<number>;
   height: MotionValue<string>;
 }
@@ -14,6 +15,7 @@ export default function GameDisplay({
   gameRunning,
   currentMultiplier,
   result,
+  payout,
   scale,
   height,
 }: GameDisplayProps) {
@@ -52,13 +54,30 @@ export default function GameDisplay({
         >
           Demo Mode
         </motion.div>
-        <span
-          className={`text-6xl relative z-10 font-bold ${
-            result === "Win" ? "text-green-400" : "text-white"
-          }`}
-        >
-          {currentMultiplier.toFixed(2)}x
-        </span>
+        <div className="relative z-10 text-center">
+          <span
+            className={`text-6xl font-bold block ${
+              result === "Win" ? "text-green-400" : "text-white"
+            }`}
+          >
+            {currentMultiplier.toFixed(2)}x
+          </span>
+          {result && payout !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2"
+            >
+              <div
+                className={`text-lg font-medium ${
+                  result === "Win" ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                {result === "Win" ? `+€${payout.toFixed(2)}` : "€0.00"}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </motion.div>
     </div>
   );
