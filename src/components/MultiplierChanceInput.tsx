@@ -16,7 +16,6 @@ export default function MultiplierChanceInput({
   const [showTooltip, setShowTooltip] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  // Check if tooltip should be shown
   const shouldShowTooltip = multiplier === "" || parseFloat(multiplier) < 1.01;
 
   return (

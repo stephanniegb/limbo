@@ -34,7 +34,7 @@ export default function Home() {
   const targetMultiplierNum = parseFloat(multiplier);
 
   const maxHeight =
-    crashPoint >= targetMultiplierNum ? 1 : crashPoint / targetMultiplierNum; //
+    crashPoint >= targetMultiplierNum ? 1 : crashPoint / targetMultiplierNum;
 
   const scale = useTransform(motionMultiplier, [1, crashPoint], [0.85, 1]);
 
@@ -70,21 +70,19 @@ export default function Home() {
     setGameRunning(true);
     setResult(null);
     setCurrentMultiplier(1.0);
-    motionMultiplier.set(1); // reset motion value
+    motionMultiplier.set(1);
 
     animate(motionMultiplier, crash, {
-      duration: 1, // animation speed proportional to crash
-      ease: "easeOut", // smooth easing
-      onUpdate: (v) => setCurrentMultiplier(v), // sync React state
+      duration: 1,
+      ease: "easeOut",
+      onUpdate: (v) => setCurrentMultiplier(v),
       onComplete: () => {
-        // handle win/loss
         const targetMultiplier = parseFloat(multiplier);
         const won = targetMultiplier <= crash;
 
         setResult(won ? "Win" : "Loss");
         setGameRunning(false);
 
-        // add to history
         const newGame: GameHistory = {
           id: `game-${Date.now()}-${Math.random()}`,
           crashPoint: crash,
@@ -97,7 +95,6 @@ export default function Home() {
     });
   }
 
-  // Check if form is valid
   const isFormValid = betAmount.trim() !== "" && parseFloat(multiplier) > 1;
 
   return (
@@ -114,33 +111,24 @@ export default function Home() {
           Fair Play
         </div>
         <div className="flex h-[calc(100%-4rem)] flex-col gap-2 w-full">
-          <div className="min-h-16 justify-end flex gap-2 p-4">
-            <AnimatePresence mode="popLayout">
-              {gameHistory.length > 0 &&
-                gameHistory.map((game) => (
+          <div className="min-h-16 justify-end flex gap-2 pt-4 overflow-hidden">
+            <div className=" h-full w-[352px] flex gap-2">
+              <AnimatePresence mode="popLayout">
+                {gameHistory.slice(0, 5).map((game, index) => (
                   <motion.div
                     key={game.id}
-                    layout
-                    initial={{ scale: 0, opacity: 0, x: 20 }}
-                    animate={{ scale: 1, opacity: 1, x: 0 }}
-                    exit={{ scale: 0, opacity: 0, x: -20 }}
-                    transition={{
-                      layout: {
-                        duration: 0.4,
-                        ease: "easeInOut",
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 20,
-                      },
-                      scale: {
-                        duration: 0.3,
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 15,
-                      },
-                      opacity: { duration: 0.2 },
-                      x: { duration: 0.3, ease: "easeOut" },
+                    initial={{ opacity: 0, scale: 0, x: 0 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      x: index * 70,
                     }}
+                    exit={{ opacity: 1, scale: 1, x: index * 70 }}
+                    transition={{
+                      duration: 0.3,
+                      ease: "easeIn",
+                    }}
+                    className="absolute"
                   >
                     <HistoryItem
                       multiplier={`${game.crashPoint.toFixed(2)}x`}
@@ -148,7 +136,8 @@ export default function Home() {
                     />
                   </motion.div>
                 ))}
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
           </div>
           <GameDisplay
             gameRunning={gameRunning}
