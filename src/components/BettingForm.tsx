@@ -59,7 +59,12 @@ export default function BettingForm({
                   setShowTooltip(false);
                 }}
                 type="number"
-                onBlur={() => setHasError(!isFormValid)}
+                onBlur={() => {
+                  const amount = parseFloat(betAmount);
+                  setHasError(
+                    betAmount.trim() === "" || isNaN(amount) || amount < 0.01
+                  );
+                }}
                 onFocus={() => setHasError(false)}
                 step="0.01"
                 min="0.01"
