@@ -5,10 +5,16 @@ import HistoryItem from "@/components/HistoryItem";
 import MultiplierChanceInput from "@/components/MultiplierChanceInput";
 import GameDisplay from "@/components/GameDisplay";
 import BettingForm from "@/components/BettingForm";
-import { motion, useMotionValue, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  AnimatePresence,
+} from "motion/react";
 import { animate } from "motion";
 
 interface GameHistory {
+  id: string;
   crashPoint: number;
   won: boolean;
   targetMultiplier: number;
@@ -24,7 +30,6 @@ export default function Home() {
   const [gameHistory, setGameHistory] = useState<GameHistory[]>([]);
 
   const motionMultiplier = useMotionValue(1);
-  const pillScale = useMotionValue(1);
 
   const targetMultiplierNum = parseFloat(multiplier);
 
@@ -47,11 +52,11 @@ export default function Home() {
     ) {
       return "0.00";
     }
-    let probability = 1 / targetMultiplier;
+    const probability = 1 / targetMultiplier;
     return (probability * 100).toFixed(4);
   }
   function getCrashMultiplier() {
-    let crash = 1 / (1 - Math.random());
+    const crash = 1 / (1 - Math.random());
     return Math.min(crash, 5);
   }
 
@@ -81,6 +86,7 @@ export default function Home() {
 
         // add to history
         const newGame: GameHistory = {
+          id: `game-${Date.now()}-${Math.random()}`,
           crashPoint: crash,
           won,
           targetMultiplier,
@@ -108,15 +114,41 @@ export default function Home() {
           Fair Play
         </div>
         <div className="flex h-[calc(100%-4rem)] flex-col gap-2 w-full">
-          <div className="min-h-16  justify-end flex gap-2 p-4">
-            {gameHistory.length > 0 &&
-              gameHistory.map((game, index) => (
-                <HistoryItem
-                  key={index}
-                  multiplier={`${game.crashPoint.toFixed(2)}x`}
-                  won={game.won}
-                />
-              ))}
+          <div className="min-h-16 justify-end flex gap-2 p-4">
+            <AnimatePresence mode="popLayout">
+              {gameHistory.length > 0 &&
+                gameHistory.map((game) => (
+                  <motion.div
+                    key={game.id}
+                    layout
+                    initial={{ scale: 0, opacity: 0, x: 20 }}
+                    animate={{ scale: 1, opacity: 1, x: 0 }}
+                    exit={{ scale: 0, opacity: 0, x: -20 }}
+                    transition={{
+                      layout: {
+                        duration: 0.4,
+                        ease: "easeInOut",
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20,
+                      },
+                      scale: {
+                        duration: 0.3,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15,
+                      },
+                      opacity: { duration: 0.2 },
+                      x: { duration: 0.3, ease: "easeOut" },
+                    }}
+                  >
+                    <HistoryItem
+                      multiplier={`${game.crashPoint.toFixed(2)}x`}
+                      won={game.won}
+                    />
+                  </motion.div>
+                ))}
+            </AnimatePresence>
           </div>
           <GameDisplay
             gameRunning={gameRunning}
